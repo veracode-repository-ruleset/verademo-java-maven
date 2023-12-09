@@ -5,8 +5,9 @@ on:
     types: [opened, synchronize, reopened]
 
 jobs:
+  
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-latest  
     steps:
       - uses: actions/checkout@v3
       - name: Run Veracode SCA
@@ -15,5 +16,4 @@ jobs:
         uses: veracode/veracode-sca@v2.1.9
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          create-issues: true  
-          quick: false
+          create-issues: false
