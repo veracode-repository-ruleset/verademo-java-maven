@@ -54,3 +54,4 @@ jobs:
           appname: test-filter-mitigation
           fail_checks_on_policy: true
           pipeline_scan_flaw_filter: unmitigated_results
+          workflow_app: false
