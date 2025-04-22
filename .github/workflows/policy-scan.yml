@@ -1,0 +1,48 @@
+name: Veracode SAST Policy Scan
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: actions/setup-java@v1
+      with:
+        java-version: 1.8
+    - name: Cache Maven Dependencies
+      uses: actions/cache@v4
+      with:
+        path: ~/.m2
+        key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+    - name: Build with Maven
+      run: mvn clean package
+
+    - uses: actions/upload-artifact@v4
+      with:
+        name: verademo.war
+        path: target/verademo.war
+
+  policy-scan:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v3
+      - name: get archive
+        uses: actions/download-artifact@v4
+        with:
+          name: verademo.war
+          path: .
+      - name: Veracoe Upload and Scan Action Step
+        uses: veracode/uploadandscan-action@v0.1.7
+        id: upload_and_scan
+        with:
+          appname: 'test-filter-mitigation'
+          createprofile: true
+          policy: VeraDemo Policy
+          version: '${{ github.run_id }}'
+          filepath: 'verademo.war'
+          vid: '${{ secrets.VERACODE_API_ID }}'
+          vkey: '${{ secrets.VERACODE_API_KEY }}'
+          failbuild: true
